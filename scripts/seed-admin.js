@@ -1,0 +1,4 @@
+const bcrypt=require("bcryptjs");const mongoose=require("mongoose");
+const uri=process.env.MONGODB_URI;const email=(process.env.ADMIN_EMAIL||"admin@gourifashions.com").toLowerCase();const password=process.env.ADMIN_PASSWORD;
+if(!uri||!password){console.error("Set MONGODB_URI and ADMIN_PASSWORD first.");process.exit(1);}
+(async()=>{await mongoose.connect(uri,{dbName:process.env.MONGODB_DB_NAME||"gouri_fashions"});const hash=await bcrypt.hash(password,12);const Admin=mongoose.models.Admin||mongoose.model("Admin",new mongoose.Schema({email:{type:String,unique:true},passwordHash:String,role:String},{timestamps:true}));await Admin.findOneAndUpdate({email},{email,passwordHash:hash,role:"admin"},{upsert:true,new:true});console.log("Admin created/updated:",email);await mongoose.disconnect();})().catch(e=>{console.error(e);process.exit(1)});

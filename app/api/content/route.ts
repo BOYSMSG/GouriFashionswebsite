@@ -1,0 +1,3 @@
+import {NextResponse} from "next/server";import {connectDB} from "@/lib/db";import Content from "@/models/Content";import {requireAdmin} from "@/lib/auth";import {youtubeEmbed} from "@/lib/content";
+export async function GET(){await connectDB();return NextResponse.json(await Content.find({}).sort({createdAt:-1}).lean());}
+export async function POST(req:Request){try{await requireAdmin();await connectDB();const b=await req.json();const embedUrl=b.platform==="youtube"?youtubeEmbed(b.url):"";const c=await Content.create({...b,embedUrl});return NextResponse.json(c,{status:201});}catch(e:any){return NextResponse.json({error:e.message==="UNAUTHORIZED"?"Unauthorized":"Server error"},{status:e.message==="UNAUTHORIZED"?401:500});}}

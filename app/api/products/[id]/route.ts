@@ -1,0 +1,3 @@
+import {NextResponse} from "next/server";import {connectDB} from "@/lib/db";import Product from "@/models/Product";import {requireAdmin} from "@/lib/auth";
+export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){try{await requireAdmin();await connectDB();await Product.findByIdAndDelete((await params).id);return NextResponse.json({ok:true});}catch(e:any){return NextResponse.json({error:"Unauthorized"},{status:401});}}
+export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){try{await requireAdmin();await connectDB();const p=await Product.findByIdAndUpdate((await params).id,await req.json(),{new:true});return NextResponse.json(p);}catch{return NextResponse.json({error:"Unauthorized"},{status:401});}}
